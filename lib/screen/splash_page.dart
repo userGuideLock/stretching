@@ -1,63 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:health/health.dart';
-import 'package:stretching/health/health_service.dart';
 
-class SplashLoginViewController extends GetxController {
-  final healthService = Get.put(HealthService());
+class SplashPageViewController extends GetxController {}
 
-  var steps = 0;
-  var heartRate = 0;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchHealthData();
-  }
-
-  void fetchHealthData() async {
-    final healthData = await healthService.fetchHealthData();
-    for (var data in healthData) {
-      if (data.type == HealthDataType.STEPS) {
-        steps += (data.value as double).toInt();
-      } else if (data.type == HealthDataType.HEART_RATE) {
-        heartRate = (data.value as double).toInt();
-      }
-    }
-    update(); // 상태 업데이트
-  }
-}
-
-class SplashLoginPage extends StatelessWidget {
-  const SplashLoginPage({super.key});
+class SplashPage extends StatelessWidget {
+  const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final SplashLoginViewController controller =
-        Get.put(SplashLoginViewController());
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Health Data'),
-      ),
+      backgroundColor: Colors.black,
       body: Center(
-        child: GetBuilder<SplashLoginViewController>(
-          builder: (controller) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '걸음 수: ${controller.steps}',
-                  style: const TextStyle(fontSize: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                '숨은 스트레스, 스트레칭이 찾아요',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  '심박수: ${controller.heartRate}',
-                  style: const TextStyle(fontSize: 24),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                '스트레칭은 숨은 스트레스를 자동 감지하고 해소를 도와줍니다. 간단하게 사용하여 건강한 일상을 유지하세요.',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
                 ),
-              ],
-            );
-          },
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Image.asset(
+              'assets/images/splash_page_star.png',
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.green[200], // 텍스트 색상
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              onPressed: () {
+                // 로그인 버튼 클릭 시 처리할 로직
+              },
+              child: const Text(
+                '로그인',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.yellow[300], // 텍스트 색상
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              onPressed: () {
+                // 회원가입 버튼 클릭 시 처리할 로직
+              },
+              child: const Text(
+                '회원가입',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
         ),
       ),
     );
