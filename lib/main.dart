@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stretching/health/health_page.dart';
 import 'package:stretching/screen/splash_page.dart';
 
 void main() {
