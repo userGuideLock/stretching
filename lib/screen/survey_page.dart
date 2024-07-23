@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stretching/screen/survey/survey_page1.dart';
 
 class SurvayViewController extends GetxController {}
 
@@ -64,7 +65,9 @@ class SurveyPage extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.to(const SurveyPage1());
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffbbffba),
                   shape: RoundedRectangleBorder(
