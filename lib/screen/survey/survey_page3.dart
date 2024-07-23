@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
-import 'package:stretching/screen/diary/diary_entry_page2.dart';
-import 'package:stretching/screen/survey/survey_page3.dart';
+import 'package:stretching/screen/survey/survey_page4.dart';
 
-class SurveyViewController2 extends GetxController {
-  String selectedButton = ''; // 선택된 버튼
+class SurveyViewController3 extends GetxController {
+  String hobby = ''; // 입력된 취미
 
-  // 버튼 선택
-  void selectButton(String button) {
-    if (selectedButton == button) {
-      selectedButton = ''; // 이미 선택된 버튼 클릭 시 선택 해제
-    } else {
-      selectedButton = button; // 새로운 버튼 선택
-    }
-    update(); // 상태 업데이트
+  void updateHobby(String value) {
+    hobby = value;
+    update();
   }
 }
 
-class SurveyPage2 extends StatelessWidget {
-  const SurveyPage2({super.key});
+class SurveyPage3 extends StatelessWidget {
+  const SurveyPage3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +21,8 @@ class SurveyPage2 extends StatelessWidget {
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
-
-    return GetBuilder<SurveyViewController2>(
-      init: SurveyViewController2(), // 컨트롤러 초기화
+    return GetBuilder<SurveyViewController3>(
+      init: SurveyViewController3(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -61,7 +54,7 @@ class SurveyPage2 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(2); // MainMatePage로 이동하도록 설정
+                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
                     Get.to(() => const BottomNavigation());
                   },
                 ),
@@ -77,7 +70,7 @@ class SurveyPage2 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '2/20 기본 정보 및 신체건강',
+                      '3/20. 일상 루틴',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -86,7 +79,7 @@ class SurveyPage2 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '당신의 직종은?',
+                      '당신의 취미는?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -94,36 +87,39 @@ class SurveyPage2 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '사무직'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '서비스직'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '감정노동'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '생산 • 제조업'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '사회서비스'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '여러 직종 혼합'),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff4a4a4a),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: TextField(
+                        onChanged: controller.updateHobby,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          hintText: '취미를 입력해주세요.',
+                          hintStyle: TextStyle(color: Color(0xff929292)),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: controller.selectedButton.isNotEmpty
+                        onPressed: controller.hobby.isNotEmpty
                             ? () {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 final combinedData = {
                                   ...previousData,
-                                  'stepTwo': controller.selectedButton
+                                  'stepThree': controller.hobby
                                 };
-                                Get.to(() => const SurveyPage3(),
-                                    arguments: combinedData);
                                 print(combinedData);
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: controller.selectedButton.isNotEmpty
+                          backgroundColor: controller.hobby.isNotEmpty
                               ? const Color(0xffbbffba)
                               : const Color(0xff4a4a4a),
                           shape: RoundedRectangleBorder(
@@ -144,39 +140,6 @@ class SurveyPage2 extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildButton(SurveyViewController2 controller, String buttonLabel) {
-    return GetBuilder<SurveyViewController2>(
-      builder: (_) {
-        return SizedBox(
-          width: double.infinity,
-          height: 105,
-          child: ElevatedButton(
-            onPressed: () {
-              controller.selectButton(buttonLabel);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: controller.selectedButton == buttonLabel
-                  ? const Color(0xff5956ff)
-                  : const Color(0xff4a4a4a),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-            ),
-            child: Text(
-              buttonLabel,
-              style: const TextStyle(
-                color: Color(0xffd9d9d9),
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
         );
