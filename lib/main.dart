@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stretching/health/health_page.dart';
 import 'package:stretching/screen/splash_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 플러그인 초기화
+
+  // 필요한 locale을 async로 초기화
+
   runApp(const MyApp());
 }
 

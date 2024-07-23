@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 enum AppState {
@@ -45,30 +47,52 @@ class HomeViewController extends GetxController {
   ];
 
   List<HealthDataAccess> get permissions =>
-      types.map((e) => HealthDataAccess.READ).toList();
+      types.map((e) => HealthDataAccess.READ_WRITE).toList();
 
   @override
   void onInit() {
     super.onInit();
-    authorize(); // 화면에 들어오자마자 권한 및 데이터 가져오기
+    checkInternetAndAuthorize(); // 화면에 들어오자마자 권한 및 데이터 가져오기
   }
 
-  Future<void> installHealthConnect() async {
-    await Health().installHealthConnect();
+  Future<void> checkInternetAndAuthorize() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      _showInternetSnackbar();
+    } else {
+      await authorize(); // 인터넷 연결되어 있으면 권한 확인 및 데이터 가져오기
+    }
   }
 
   Future<void> authorize() async {
-    // 모든 관련 권한 요청
+    debugPrint("Requesting permissions...");
     await Permission.activityRecognition.request();
     await Permission.location.request();
     await Permission.sensors.request();
 
+    var activityRecognitionStatus = await Permission.activityRecognition.status;
+    var locationStatus = await Permission.location.status;
+    var sensorsStatus = await Permission.sensors.status;
+
+    if (activityRecognitionStatus.isGranted &&
+        locationStatus.isGranted &&
+        sensorsStatus.isGranted) {
+      debugPrint("All necessary permissions granted.");
+    } else {
+      debugPrint(
+          "Permissions not granted. activityRecognition: $activityRecognitionStatus, location: $locationStatus, sensors: $sensorsStatus");
+      return;
+    }
+
     bool? hasPermissions =
         await _health.hasPermissions(types, permissions: permissions);
-    if (hasPermissions!) {
+    debugPrint("Initial permission check: $hasPermissions");
+
+    if (hasPermissions == null || !hasPermissions) {
       try {
         bool authorized =
             await _health.requestAuthorization(types, permissions: permissions);
+        debugPrint("Authorization result: $authorized");
         state = authorized ? AppState.AUTHORIZED : AppState.AUTH_NOT_GRANTED;
       } catch (error) {
         debugPrint("권한 부여 중 예외 발생: $error");
@@ -112,25 +136,19 @@ class HomeViewController extends GetxController {
     averageHeartRate = 0.0;
 
     try {
-      bool isAuthorized = await _health.requestAuthorization(types);
-      if (!isAuthorized) {
-        state = AppState.AUTH_REQUIRED;
-        update();
-        _showLoginSnackbar();
-        return;
-      }
-
       List<HealthDataPoint> healthData = await _health.getHealthDataFromTypes(
         types: types,
         startTime: todayStart,
         endTime: now,
       );
 
+      debugPrint("Fetched health data: ${healthData.length} points");
+
       healthDataList.addAll(healthData);
       _calculateTotals();
       lastFetchTime = now; // 데이터 가져온 시간 저장
     } catch (error) {
-      print("getHealthDataFromTypes에서 예외 발생: $error");
+      debugPrint("getHealthDataFromTypes에서 예외 발생: $error");
     }
     healthDataList = _health.removeDuplicates(healthDataList);
     state = healthDataList.isEmpty ? AppState.NO_DATA : AppState.DATA_READY;
@@ -206,6 +224,15 @@ class HomeViewController extends GetxController {
       ),
     );
   }
+
+  void _showInternetSnackbar() {
+    Get.snackbar(
+      '인터넷 연결 필요',
+      '이 앱은 데이터를 가져오기 위해 인터넷 연결이 필요합니다. 인터넷 연결을 확인해주세요.',
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 5),
+    );
+  }
 }
 
 class HomePage extends StatelessWidget {
@@ -268,6 +295,20 @@ class HomePage extends StatelessWidget {
                         style:
                             const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
+                    if (controller.state == AppState.NO_DATA)
+                      const Text(
+                        '가져올 데이터가 없습니다.',
+                        style: TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    const SizedBox(height: 16),
+                    _buildDataBox(
+                      icon: Icons.directions_walk,
+                      title: '걸음수',
+                      value: controller.totalSteps.toString(),
+                      subTitle: 'steps',
+                      fetchTime: controller.stepsFetchTime,
+                      image: 'images/home_page_box.png',
+                    ),
                     const SizedBox(height: 16),
                     _buildDataBox(
                       icon: Icons.bed,
@@ -321,15 +362,6 @@ class HomePage extends StatelessWidget {
                       value: controller.averageHeartRate.toStringAsFixed(1),
                       subTitle: 'BPM',
                       fetchTime: controller.heartRateFetchTime,
-                      image: 'images/home_page_box.png',
-                    ),
-                    const SizedBox(height: 16),
-                    _buildDataBox(
-                      icon: Icons.directions_walk,
-                      title: '걸음수',
-                      value: controller.totalSteps.toString(),
-                      subTitle: 'steps',
-                      fetchTime: controller.stepsFetchTime,
                       image: 'images/home_page_box.png',
                     ),
                   ],
@@ -390,7 +422,7 @@ class HomePage extends StatelessWidget {
               ),
               if (fetchTime != null)
                 Text(
-                  '데이터 업데이트 시간: $fetchTime',
+                  '$fetchTime',
                   style: const TextStyle(color: Colors.grey, fontSize: 12),
                 ),
             ],
