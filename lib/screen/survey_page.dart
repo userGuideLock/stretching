@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class SurvayViewController extends GetxController {}
 
 class SurveyPage extends StatelessWidget {
   const SurveyPage({super.key});
@@ -28,8 +31,58 @@ class SurveyPage extends StatelessWidget {
           ),
         ),
       ),
-      body: const Center(
-        child: Text('설문 페이지 내용'),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 30),
+            const Column(
+              children: [
+                Text(
+                  '나도 모르게 \n생기는 스트레스 \n더 자세히 알아볼까요?',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '스트레스는 우리도 모르게 쌓여 일상에 영향을 미칠 수 있습니다. 이 질문지는 당신의 숨은 스트레스를 더 잘 이해하고, 효과적으로 관리할 수 있도록 도와드리기 위해 마련되었습니다. ',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            Image.asset(
+              'images/survey_page_img.png',
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffbbffba),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                ),
+                child: const Text(
+                  '다음',
+                  style: TextStyle(
+                    color: Color(0xff282828),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
