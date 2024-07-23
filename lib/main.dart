@@ -4,6 +4,7 @@ import 'package:stretching/health/health_page.dart';
 import 'package:stretching/screen/splash_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized(); // 플러그인 초기화
   runApp(const MyApp());
 }
 
