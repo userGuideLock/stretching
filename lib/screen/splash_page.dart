@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/login_page.dart';
+import 'package:stretching/screen/register/register_page1.dart';
 import 'package:stretching/screen/register_page.dart';
 
 class SplashPageViewController extends GetxController {}
@@ -130,7 +131,7 @@ Widget SignupButton() {
       ),
       onPressed: () {
         // 회원가입 버튼 클릭 시 처리할 로직
-        Get.to(const RegisterPage());
+        Get.to(const RegisterPage1());
       },
       child: const Text(
         '회원가입',

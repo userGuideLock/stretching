@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/diary/diary_entry_page2.dart';
+import 'package:stretching/screen/register/register_page2.dart';
+import 'package:stretching/screen/splash_page.dart';
 import 'package:stretching/screen/survey/survey_page2.dart';
 
-class SurveyViewController1 extends GetxController {
+class RegisterViewController1 extends GetxController {
   String selectedButton = ''; // 선택된 버튼
 
   // 버튼 선택
@@ -18,14 +20,13 @@ class SurveyViewController1 extends GetxController {
   }
 }
 
-class SurveyPage1 extends StatelessWidget {
-  const SurveyPage1({super.key});
+class RegisterPage1 extends StatelessWidget {
+  const RegisterPage1({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
-    return GetBuilder<SurveyViewController1>(
-      init: SurveyViewController1(), // 컨트롤러 초기화
+    return GetBuilder<RegisterViewController1>(
+      init: RegisterViewController1(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -57,8 +58,7 @@ class SurveyPage1 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
-                    Get.to(() => const BottomNavigation());
+                    Get.to(() => const SplashPage());
                   },
                 ),
               ),
@@ -73,7 +73,7 @@ class SurveyPage1 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '1/22 기본 정보 및 신체건강',
+                      '1/4 회원가입',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -82,7 +82,7 @@ class SurveyPage1 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 평소\n몇시에 잠자리에 들었습니까?',
+                      '당신의 성별은?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -90,14 +90,10 @@ class SurveyPage1 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오전 6시 - 오전 12시'),
+                    _buildButton(controller, '남'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오후 12시 - 오후 6시'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '오후 6시 - 오후 12시'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '오전 12시 - 오전 6시'),
-                    const SizedBox(height: 60),
+                    _buildButton(controller, '여'),
+                    const SizedBox(height: 280),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -105,8 +101,8 @@ class SurveyPage1 extends StatelessWidget {
                         onPressed: controller.selectedButton.isNotEmpty
                             ? () {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
-                                Get.to(() => const SurveyPage2(), arguments: {
-                                  'step1': controller.selectedButton
+                                Get.to(() => const RegisterPage2(), arguments: {
+                                  'stepOne': controller.selectedButton
                                 });
                                 print(controller.selectedButton);
                               }
@@ -140,8 +136,8 @@ class SurveyPage1 extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(SurveyViewController1 controller, String buttonLabel) {
-    return GetBuilder<SurveyViewController1>(
+  Widget _buildButton(RegisterViewController1 controller, String buttonLabel) {
+    return GetBuilder<RegisterViewController1>(
       builder: (_) {
         return SizedBox(
           width: double.infinity,

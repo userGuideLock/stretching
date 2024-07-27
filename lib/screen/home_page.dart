@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -29,7 +28,9 @@ class HomeViewController extends GetxController {
   var deepSleepMinutes = 0;
   var lightSleepMinutes = 0;
   var remSleepMinutes = 0;
-  var averageHeartRate = 0.0;
+  var averageHeartRate = 0.0; // 평균값 초기화
+  var respiratoryRate = 0.0; // 평균값 초기화
+  var stressScore = 0; // 초기 스트레스 점수
   DateTime? lastFetchTime;
 
   DateTime? stepsFetchTime;
@@ -44,6 +45,7 @@ class HomeViewController extends GetxController {
     HealthDataType.SLEEP_LIGHT,
     HealthDataType.SLEEP_REM,
     HealthDataType.HEART_RATE,
+    HealthDataType.RESPIRATORY_RATE,
   ];
 
   List<HealthDataAccess> get permissions =>
@@ -51,8 +53,9 @@ class HomeViewController extends GetxController {
 
   @override
   void onInit() {
+    Health().configure(useHealthConnectIfAvailable: true);
     super.onInit();
-    checkInternetAndAuthorize(); // 화면에 들어오자마자 권한 및 데이터 가져오기
+    checkInternetAndAuthorize();
   }
 
   Future<void> checkInternetAndAuthorize() async {
@@ -65,43 +68,25 @@ class HomeViewController extends GetxController {
   }
 
   Future<void> authorize() async {
-    debugPrint("Requesting permissions...");
+    // 모든 관련 권한 요청
     await Permission.activityRecognition.request();
     await Permission.location.request();
     await Permission.sensors.request();
 
-    var activityRecognitionStatus = await Permission.activityRecognition.status;
-    var locationStatus = await Permission.location.status;
-    var sensorsStatus = await Permission.sensors.status;
-
-    if (activityRecognitionStatus.isGranted &&
-        locationStatus.isGranted &&
-        sensorsStatus.isGranted) {
-      debugPrint("All necessary permissions granted.");
-    } else {
-      debugPrint(
-          "Permissions not granted. activityRecognition: $activityRecognitionStatus, location: $locationStatus, sensors: $sensorsStatus");
-      return;
-    }
-
     bool? hasPermissions =
         await _health.hasPermissions(types, permissions: permissions);
-    debugPrint("Initial permission check: $hasPermissions");
-
-    if (hasPermissions == null || !hasPermissions) {
+    bool authorized = false;
+    if (!hasPermissions!) {
       try {
-        bool authorized =
+        authorized =
             await _health.requestAuthorization(types, permissions: permissions);
-        debugPrint("Authorization result: $authorized");
-        state = authorized ? AppState.AUTHORIZED : AppState.AUTH_NOT_GRANTED;
       } catch (error) {
         debugPrint("권한 부여 중 예외 발생: $error");
-        state = AppState.AUTH_NOT_GRANTED;
       }
     } else {
-      state = AppState.AUTHORIZED;
+      authorized = true;
     }
-
+    state = authorized ? AppState.AUTHORIZED : AppState.AUTH_NOT_GRANTED;
     update();
 
     if (state == AppState.AUTH_NOT_GRANTED) {
@@ -125,6 +110,7 @@ class HomeViewController extends GetxController {
 
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
+    final monthStart = DateTime(now.year, now.month - 1, now.day);
     healthDataList.clear();
     totalSteps = 0;
     totalSleepMinutes = 0;
@@ -133,20 +119,32 @@ class HomeViewController extends GetxController {
     deepSleepMinutes = 0;
     lightSleepMinutes = 0;
     remSleepMinutes = 0;
-    averageHeartRate = 0.0;
+    averageHeartRate = 0.0; // 평균값 초기화
+    respiratoryRate = 0.0; // 평균값 초기화
 
     try {
-      List<HealthDataPoint> healthData = await _health.getHealthDataFromTypes(
-        types: types,
+      // 걸음수 데이터 가져오기 (오늘)
+      List<HealthDataPoint> stepsData = await _health.getHealthDataFromTypes(
+        types: [HealthDataType.STEPS],
         startTime: todayStart,
         endTime: now,
       );
 
-      debugPrint("Fetched health data: ${healthData.length} points");
+      // 나머지 데이터 가져오기 (한 달 이내)
+      List<HealthDataPoint> otherData = await _health.getHealthDataFromTypes(
+        types: types.where((type) => type != HealthDataType.STEPS).toList(),
+        startTime: monthStart,
+        endTime: now,
+      );
 
-      healthDataList.addAll(healthData);
+      debugPrint(
+          "Fetched health data: ${stepsData.length + otherData.length} points");
+
+      healthDataList.addAll(stepsData);
+      healthDataList.addAll(otherData);
       _calculateTotals();
       lastFetchTime = now; // 데이터 가져온 시간 저장
+      stressScore = calculateTotalScore(); // 스트레스 점수 업데이트
     } catch (error) {
       debugPrint("getHealthDataFromTypes에서 예외 발생: $error");
     }
@@ -157,6 +155,7 @@ class HomeViewController extends GetxController {
 
   void _calculateTotals() {
     int heartRateCount = 0;
+    int respiratoryRateCount = 0;
 
     for (var point in healthDataList) {
       if (point.value is NumericHealthValue) {
@@ -171,23 +170,142 @@ class HomeViewController extends GetxController {
           heartRateCount++;
           heartRateFetchTime = point.dateTo;
         }
-        if (point.type == HealthDataType.SLEEP_ASLEEP ||
-            point.type == HealthDataType.SLEEP_AWAKE ||
-            point.type == HealthDataType.SLEEP_DEEP ||
-            point.type == HealthDataType.SLEEP_LIGHT ||
-            point.type == HealthDataType.SLEEP_REM) {
-          totalSleepMinutes += numericValue.toInt();
+        if (point.type == HealthDataType.RESPIRATORY_RATE) {
+          respiratoryRate += numericValue;
+          respiratoryRateCount++;
+        }
+        if (point.type == HealthDataType.SLEEP_ASLEEP) {
+          asleepMinutes += numericValue.toInt();
           sleepFetchTime = point.dateTo;
+        }
+        if (point.type == HealthDataType.SLEEP_AWAKE) {
+          awakeMinutes += numericValue.toInt();
+        }
+        if (point.type == HealthDataType.SLEEP_DEEP) {
+          deepSleepMinutes += numericValue.toInt();
+        }
+        if (point.type == HealthDataType.SLEEP_LIGHT) {
+          lightSleepMinutes += numericValue.toInt();
+        }
+        if (point.type == HealthDataType.SLEEP_REM) {
+          remSleepMinutes += numericValue.toInt();
         }
       }
     }
 
     if (heartRateCount > 0) {
       averageHeartRate /= heartRateCount;
+    } else {
+      averageHeartRate = 60.0; // 기본 평균값 사용
+    }
+
+    if (respiratoryRateCount > 0) {
+      respiratoryRate /= respiratoryRateCount;
+    } else {
+      respiratoryRate = 16.0; // 기본 평균값 사용
     }
   }
 
   double get totalSleepHours => totalSleepMinutes / 60;
+
+  int calculateSleepScore() {
+    if (totalSleepMinutes == 0) return 5;
+    if (totalSleepHours >= 7 && totalSleepHours <= 9) {
+      return 5;
+    } else if ((totalSleepHours >= 6 && totalSleepHours < 7) ||
+        (totalSleepHours > 9 && totalSleepHours <= 10)) {
+      return 10;
+    } else if ((totalSleepHours >= 5 && totalSleepHours < 6) ||
+        (totalSleepHours > 10 && totalSleepHours <= 11)) {
+      return 15;
+    } else {
+      return 20;
+    }
+  }
+
+  int calculateSleepStageScore(int stageMinutes, double percentage) {
+    if (stageMinutes == 0) return 5;
+    if (percentage >= 20 && percentage <= 25) {
+      return 0;
+    } else if ((percentage >= 15 && percentage < 20) ||
+        (percentage > 25 && percentage <= 30)) {
+      return 2;
+    } else if ((percentage >= 10 && percentage < 15) ||
+        (percentage > 30 && percentage <= 35)) {
+      return 4;
+    } else {
+      return 6;
+    }
+  }
+
+  int calculateSleepAwakeScore() {
+    if (awakeMinutes == 0) return 5;
+    if (awakeMinutes <= 10) {
+      return 0;
+    } else if (awakeMinutes <= 20) {
+      return 10;
+    } else {
+      return 20;
+    }
+  }
+
+  int calculateHeartRateScore() {
+    if (averageHeartRate == 0) return 5;
+    if (averageHeartRate >= 40 && averageHeartRate <= 60) {
+      return 0;
+    } else if (averageHeartRate > 60 && averageHeartRate <= 70) {
+      return 10;
+    } else if ((averageHeartRate > 70) || (averageHeartRate < 40)) {
+      return 15;
+    } else {
+      return 20;
+    }
+  }
+
+  int calculateRespiratoryRateScore() {
+    if (respiratoryRate == 0) return 10;
+    if (respiratoryRate >= 12 && respiratoryRate <= 20) {
+      return 0;
+    } else if (respiratoryRate > 20 && respiratoryRate <= 24) {
+      return 10;
+    } else if (respiratoryRate > 24 || respiratoryRate < 12) {
+      return 15;
+    } else {
+      return 20;
+    }
+  }
+
+  int calculateTotalScore() {
+    int sleepScore = calculateSleepScore();
+    double deepSleepPercentage = totalSleepMinutes == 0
+        ? 0
+        : (deepSleepMinutes / totalSleepMinutes) * 100;
+    double remSleepPercentage = totalSleepMinutes == 0
+        ? 0
+        : (remSleepMinutes / totalSleepMinutes) * 100;
+    double lightSleepPercentage = totalSleepMinutes == 0
+        ? 0
+        : (lightSleepMinutes / totalSleepMinutes) * 100;
+
+    int deepSleepScore =
+        calculateSleepStageScore(deepSleepMinutes, deepSleepPercentage);
+    int remSleepScore =
+        calculateSleepStageScore(remSleepMinutes, remSleepPercentage);
+    int lightSleepScore =
+        calculateSleepStageScore(lightSleepMinutes, lightSleepPercentage);
+
+    int sleepAwakeScore = calculateSleepAwakeScore();
+    int heartRateScore = calculateHeartRateScore();
+    int respiratoryRateScore = calculateRespiratoryRateScore();
+
+    return sleepScore +
+        deepSleepScore +
+        remSleepScore +
+        lightSleepScore +
+        sleepAwakeScore +
+        heartRateScore +
+        respiratoryRateScore;
+  }
 
   void _showAuthorizationSnackbar() {
     Get.snackbar(
@@ -210,7 +328,7 @@ class HomeViewController extends GetxController {
   void _showLoginSnackbar() {
     Get.snackbar(
       '로그인이 필요합니다',
-      '이 앱은 Google Fit 또는 Apple Health에 로그인해야 데이터를 가져올 수 있습니다. 로그인 이후 헬스 커넥터를 설치하여 허용해주세요.',
+      '헬스 커넥터를 설치하여 허용해주세요.',
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 5),
       mainButton: TextButton(
@@ -289,17 +407,18 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                     const SizedBox(height: 16),
-                    if (controller.lastFetchTime != null)
-                      Text(
-                        '데이터 업데이트 시간: ${controller.lastFetchTime}',
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    if (controller.state == AppState.NO_DATA)
-                      const Text(
-                        '가져올 데이터가 없습니다.',
-                        style: TextStyle(color: Colors.red, fontSize: 14),
-                      ),
+                    _buildDataBox(
+                      icon: controller.state == AppState.NO_DATA
+                          ? Icons.help_outline
+                          : Icons.emoji_emotions,
+                      title: '스트레스 점수',
+                      value: controller.state == AppState.NO_DATA
+                          ? '가져올 데이터가 없습니다.'
+                          : '${controller.stressScore} / 100',
+                      subTitle: '',
+                      fetchTime: controller.lastFetchTime,
+                      image: 'images/home_page_box.png',
+                    ),
                     const SizedBox(height: 16),
                     _buildDataBox(
                       icon: Icons.directions_walk,
@@ -364,6 +483,16 @@ class HomePage extends StatelessWidget {
                       fetchTime: controller.heartRateFetchTime,
                       image: 'images/home_page_box.png',
                     ),
+                    const SizedBox(height: 16),
+                    _buildDataBox(
+                      icon: Icons.air,
+                      title: '호흡률',
+                      value: controller.respiratoryRate.toStringAsFixed(1),
+                      subTitle: 'BPM',
+                      fetchTime: controller.sleepFetchTime,
+                      image: 'images/home_page_box.png',
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -404,7 +533,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
               ),
@@ -413,7 +542,7 @@ class HomePage extends StatelessWidget {
                 value,
                 style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold),
               ),
               Text(

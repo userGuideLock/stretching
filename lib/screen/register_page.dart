@@ -43,6 +43,10 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 이전 페이지에서 전달된 데이터 가져오기
+    final Map<String, dynamic> previousData =
+        Get.arguments as Map<String, dynamic>;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -181,7 +185,17 @@ class RegisterPage extends StatelessWidget {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: controller.register,
+                      onPressed: () {
+                        // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
+                        final combinedData = {
+                          ...previousData,
+                          'name': controller.name,
+                          'email': controller.email,
+                          'password': controller.password,
+                        };
+
+                        print(combinedData);
+                      },
                       style: ButtonStyle(
                         backgroundColor:
                             WidgetStateProperty.all(const Color(0xFFF2FE8D)),

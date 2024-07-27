@@ -2,34 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/diary/diary_entry_page2.dart';
+import 'package:stretching/screen/register/register_page3.dart';
+import 'package:stretching/screen/register/register_page4.dart';
+import 'package:stretching/screen/register_page.dart';
+import 'package:stretching/screen/splash_page.dart';
 import 'package:stretching/screen/survey/survey_page3.dart';
 
-class SurveyViewController2 extends GetxController {
-  String selectedButton = ''; // 선택된 버튼
+class RegisterViewController4 extends GetxController {
+  final selectedButtons = <String>[];
 
-  // 버튼 선택
+  // 버튼 선택/해제
   void selectButton(String button) {
-    if (selectedButton == button) {
-      selectedButton = ''; // 이미 선택된 버튼 클릭 시 선택 해제
+    if (selectedButtons.contains(button)) {
+      selectedButtons.remove(button); // 이미 선택된 버튼 클릭 시 선택 해제
     } else {
-      selectedButton = button; // 새로운 버튼 선택
+      if (selectedButtons.length < 4) {
+        selectedButtons.add(button); // 4개 미만인 경우 새로운 버튼 선택
+      }
     }
     update(); // 상태 업데이트
   }
+
+  bool get isButtonLimitReached => selectedButtons.length == 4;
 }
 
-class SurveyPage2 extends StatelessWidget {
-  const SurveyPage2({super.key});
+class RegisterPage4 extends StatelessWidget {
+  const RegisterPage4({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
 
-    return GetBuilder<SurveyViewController2>(
-      init: SurveyViewController2(), // 컨트롤러 초기화
+    return GetBuilder<RegisterViewController4>(
+      init: RegisterViewController4(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -61,8 +68,7 @@ class SurveyPage2 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(2); // MainMatePage로 이동하도록 설정
-                    Get.to(() => const BottomNavigation());
+                    Get.to(() => const SplashPage());
                   },
                 ),
               ),
@@ -77,7 +83,7 @@ class SurveyPage2 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '2/22 기본 정보 및 신체건강',
+                      '4/4 회원가입',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -86,7 +92,7 @@ class SurveyPage2 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 평소 잠이 들기까지 \n얼마나 오래 걸렸습니까?',
+                      '어떤 방식으로 \n스트레스를 해소하나요?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -94,50 +100,66 @@ class SurveyPage2 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '10분 이내'),
+                    _buildButton(controller, '운동'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '20분 이내'),
+                    _buildButton(controller, '명상'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '30분 이내'),
+                    _buildButton(controller, '독서'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '1시간 이내'),
+                    _buildButton(controller, '음악감상'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '2시간 이내'),
+                    _buildButton(controller, '산책'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '2시간 이상'),
+                    _buildButton(controller, '요가'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '친구'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '영화'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '수면'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '요리'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '여행'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '미술활동'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
-                      child: ElevatedButton(
-                        onPressed: controller.selectedButton.isNotEmpty
-                            ? () {
-                                // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
-                                final combinedData = {
-                                  ...previousData,
-                                  'step2': controller.selectedButton
-                                };
-                                Get.to(() => const SurveyPage3(),
-                                    arguments: combinedData);
-                                print(combinedData);
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: controller.selectedButton.isNotEmpty
-                              ? const Color(0xffbbffba)
-                              : const Color(0xff4a4a4a),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                        ),
-                        child: const Text(
-                          '다음',
-                          style: TextStyle(
-                            color: Color(0xff282828),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
+                      child: GetBuilder<RegisterViewController4>(
+                        builder: (controller) {
+                          return ElevatedButton(
+                            onPressed: controller.isButtonLimitReached
+                                ? () {
+                                    // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
+                                    final combinedData = {
+                                      ...previousData,
+                                      'stepFour': controller.selectedButtons
+                                    };
+                                    Get.to(() => const RegisterPage(),
+                                        arguments: combinedData);
+                                    print(combinedData);
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: controller.isButtonLimitReached
+                                  ? const Color(0xffbbffba)
+                                  : const Color(0xff4a4a4a),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                            ),
+                            child: const Text(
+                              '다음',
+                              style: TextStyle(
+                                color: Color(0xff282828),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 50),
@@ -151,8 +173,8 @@ class SurveyPage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(SurveyViewController2 controller, String buttonLabel) {
-    return GetBuilder<SurveyViewController2>(
+  Widget _buildButton(RegisterViewController4 controller, String buttonLabel) {
+    return GetBuilder<RegisterViewController4>(
       builder: (_) {
         return SizedBox(
           width: double.infinity,
@@ -162,7 +184,7 @@ class SurveyPage2 extends StatelessWidget {
               controller.selectButton(buttonLabel);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: controller.selectedButton == buttonLabel
+              backgroundColor: controller.selectedButtons.contains(buttonLabel)
                   ? const Color(0xff5956ff)
                   : const Color(0xff4a4a4a),
               shape: RoundedRectangleBorder(

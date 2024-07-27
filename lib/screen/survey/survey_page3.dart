@@ -4,11 +4,16 @@ import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/survey/survey_page4.dart';
 
 class SurveyViewController3 extends GetxController {
-  String hobby = ''; // 입력된 취미
+  String selectedButton = ''; // 선택된 버튼
 
-  void updateHobby(String value) {
-    hobby = value;
-    update();
+  // 버튼 선택
+  void selectButton(String button) {
+    if (selectedButton == button) {
+      selectedButton = ''; // 이미 선택된 버튼 클릭 시 선택 해제
+    } else {
+      selectedButton = button; // 새로운 버튼 선택
+    }
+    update(); // 상태 업데이트
   }
 }
 
@@ -79,7 +84,7 @@ class SurveyPage3 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '당신의 취미는?',
+                      '지난 한달 동안 평소\n몇시에 일어났습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -87,39 +92,32 @@ class SurveyPage3 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff4a4a4a),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: TextField(
-                        onChanged: controller.updateHobby,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: '취미를 입력해주세요.',
-                          hintStyle: TextStyle(color: Color(0xff929292)),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
+                    _buildButton(controller, '오전 6시 - 오전 12시'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '오후 12시 - 오후 6시'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '오후 6시 - 오후 12시'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '오전 12시 - 오전 6시'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: controller.hobby.isNotEmpty
+                        onPressed: controller.selectedButton.isNotEmpty
                             ? () {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 final combinedData = {
                                   ...previousData,
-                                  'stepThree': controller.hobby
+                                  'stepThree': controller.selectedButton
                                 };
+                                Get.to(() => const SurveyPage4(),
+                                    arguments: combinedData);
                                 print(combinedData);
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: controller.hobby.isNotEmpty
+                          backgroundColor: controller.selectedButton.isNotEmpty
                               ? const Color(0xffbbffba)
                               : const Color(0xff4a4a4a),
                           shape: RoundedRectangleBorder(
@@ -146,4 +144,37 @@ class SurveyPage3 extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _buildButton(SurveyViewController3 controller, String buttonLabel) {
+  return GetBuilder<SurveyViewController3>(
+    builder: (_) {
+      return SizedBox(
+        width: double.infinity,
+        height: 105,
+        child: ElevatedButton(
+          onPressed: () {
+            controller.selectButton(buttonLabel);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: controller.selectedButton == buttonLabel
+                ? const Color(0xff5956ff)
+                : const Color(0xff4a4a4a),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+          ),
+          child: Text(
+            buttonLabel,
+            style: const TextStyle(
+              color: Color(0xffd9d9d9),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    },
+  );
 }

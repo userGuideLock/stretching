@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
-import 'package:stretching/screen/diary/diary_entry_page2.dart';
-import 'package:stretching/screen/survey/survey_page2.dart';
+import 'package:stretching/screen/survey/survey_page22.dart';
+import 'package:stretching/screen/survey/survey_page4.dart';
 
-class SurveyViewController1 extends GetxController {
+class SurveyViewController21 extends GetxController {
   String selectedButton = ''; // 선택된 버튼
 
   // 버튼 선택
@@ -18,14 +18,17 @@ class SurveyViewController1 extends GetxController {
   }
 }
 
-class SurveyPage1 extends StatelessWidget {
-  const SurveyPage1({super.key});
+class SurveyPage21 extends StatelessWidget {
+  const SurveyPage21({super.key});
 
   @override
   Widget build(BuildContext context) {
     final BottomNavigationController navController = Get.find();
-    return GetBuilder<SurveyViewController1>(
-      init: SurveyViewController1(), // 컨트롤러 초기화
+    // 이전 페이지에서 전달된 데이터 가져오기
+    final Map<String, dynamic> previousData =
+        Get.arguments as Map<String, dynamic>;
+    return GetBuilder<SurveyViewController21>(
+      init: SurveyViewController21(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -73,7 +76,7 @@ class SurveyPage1 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '1/22 기본 정보 및 신체건강',
+                      '21/22. 일상 루틴',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -82,21 +85,24 @@ class SurveyPage1 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 평소\n몇시에 잠자리에 들었습니까?',
+                      '지난 한달간 당신이 "잠잘 때" 숨을\n한동안 멈추고 다시 숨쉬기를 자주 했는지 물어보십시오',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                       ),
                     ),
+                    const SizedBox(
+                      height: 15,
+                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오전 6시 - 오전 12시'),
+                    _buildButton(controller, '지난 한 달 동안 없었다.'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오후 12시 - 오후 6시'),
+                    _buildButton(controller, '한 주에 1번보다 적게'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오후 6시 - 오후 12시'),
+                    _buildButton(controller, '한 주에 1~2번 정도'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오전 12시 - 오전 6시'),
+                    _buildButton(controller, '한 주에 3번 이상'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
@@ -105,10 +111,13 @@ class SurveyPage1 extends StatelessWidget {
                         onPressed: controller.selectedButton.isNotEmpty
                             ? () {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
-                                Get.to(() => const SurveyPage2(), arguments: {
-                                  'step1': controller.selectedButton
-                                });
-                                print(controller.selectedButton);
+                                final combinedData = {
+                                  ...previousData,
+                                  'step21': controller.selectedButton
+                                };
+                                Get.to(() => const SurveyPage22(),
+                                    arguments: combinedData);
+                                print(combinedData);
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
@@ -139,37 +148,37 @@ class SurveyPage1 extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _buildButton(SurveyViewController1 controller, String buttonLabel) {
-    return GetBuilder<SurveyViewController1>(
-      builder: (_) {
-        return SizedBox(
-          width: double.infinity,
-          height: 105,
-          child: ElevatedButton(
-            onPressed: () {
-              controller.selectButton(buttonLabel);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: controller.selectedButton == buttonLabel
-                  ? const Color(0xff5956ff)
-                  : const Color(0xff4a4a4a),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-            ),
-            child: Text(
-              buttonLabel,
-              style: const TextStyle(
-                color: Color(0xffd9d9d9),
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
+Widget _buildButton(SurveyViewController21 controller, String buttonLabel) {
+  return GetBuilder<SurveyViewController21>(
+    builder: (_) {
+      return SizedBox(
+        width: double.infinity,
+        height: 105,
+        child: ElevatedButton(
+          onPressed: () {
+            controller.selectButton(buttonLabel);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: controller.selectedButton == buttonLabel
+                ? const Color(0xff5956ff)
+                : const Color(0xff4a4a4a),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4.0),
             ),
           ),
-        );
-      },
-    );
-  }
+          child: Text(
+            buttonLabel,
+            style: const TextStyle(
+              color: Color(0xffd9d9d9),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    },
+  );
 }
