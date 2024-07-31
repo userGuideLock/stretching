@@ -39,6 +39,7 @@ dependencies:
   flutter_health_connect: ^1.2.3
   webview_flutter: ^4.8.0
   webview_flutter_android: ^3.16.4
+  device_info_plus: ^9.0.2
   
 
 

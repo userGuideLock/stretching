@@ -60,8 +60,7 @@ class DiaryEntryPage2 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
-                    Get.to(() => const BottomNavigation());
+                    Get.off(() => const BottomNavigation());
                   },
                 ),
               ),

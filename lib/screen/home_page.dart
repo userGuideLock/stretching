@@ -196,13 +196,13 @@ class HomeViewController extends GetxController {
     if (heartRateCount > 0) {
       averageHeartRate /= heartRateCount;
     } else {
-      averageHeartRate = 60.0; // 기본 평균값 사용
+      averageHeartRate = 0; // 기본 평균값 사용
     }
 
     if (respiratoryRateCount > 0) {
       respiratoryRate /= respiratoryRateCount;
     } else {
-      respiratoryRate = 16.0; // 기본 평균값 사용
+      respiratoryRate = 0; // 기본 평균값 사용
     }
   }
 
@@ -250,7 +250,7 @@ class HomeViewController extends GetxController {
   }
 
   int calculateHeartRateScore() {
-    if (averageHeartRate == 0) return 5;
+    if (averageHeartRate == 0) return 10;
     if (averageHeartRate >= 40 && averageHeartRate <= 60) {
       return 0;
     } else if (averageHeartRate > 60 && averageHeartRate <= 70) {
@@ -263,7 +263,7 @@ class HomeViewController extends GetxController {
   }
 
   int calculateRespiratoryRateScore() {
-    if (respiratoryRate == 0) return 10;
+    if (respiratoryRate == 0) return 0;
     if (respiratoryRate >= 12 && respiratoryRate <= 20) {
       return 0;
     } else if (respiratoryRate > 20 && respiratoryRate <= 24) {

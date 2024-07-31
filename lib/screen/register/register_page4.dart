@@ -92,7 +92,7 @@ class RegisterPage4 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '어떤 방식으로 \n스트레스를 해소하나요?',
+                      '어떤 방식으로 스트레스를 해소하나요?(4개)',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,

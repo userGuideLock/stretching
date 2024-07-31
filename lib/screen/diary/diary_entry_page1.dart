@@ -18,9 +18,7 @@ class DiaryEntryViewController1 extends GetxController {
 }
 
 class DiaryEntryPage1 extends StatelessWidget {
-  const DiaryEntryPage1({super.key, required this.entry});
-
-  final Map<String, dynamic> entry;
+  const DiaryEntryPage1({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +56,7 @@ class DiaryEntryPage1 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
-                    Get.to(() => const BottomNavigation());
+                    Get.off(() => const BottomNavigation());
                   },
                 ),
               ),
@@ -115,7 +112,6 @@ class DiaryEntryPage1 extends StatelessWidget {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 Get.to(() => const DiaryEntryPage2(),
                                     arguments: {
-                                      'entry': entry,
                                       'stepOne': controller.selectedButton
                                     });
                                 print(controller.selectedButton);

@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class RegisterViewController extends GetxController {
   String name = '';
   String email = '';
   String password = '';
+  String uuid = '';
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initUUID();
+  }
+
+  Future<void> _initUUID() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (GetPlatform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      uuid = androidInfo.id;
+    } else if (GetPlatform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      uuid = iosInfo.identifierForVendor!;
+    }
+    update();
+  }
 
   void updateName(String value) {
     name = value;
@@ -21,7 +41,7 @@ class RegisterViewController extends GetxController {
     update();
   }
 
-  void register() {
+  void register(Map<String, dynamic> previousData) {
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       Get.snackbar(
         duration: const Duration(milliseconds: 1000),
@@ -33,8 +53,16 @@ class RegisterViewController extends GetxController {
       );
       return;
     }
+    final combinedData = {
+      ...previousData,
+      'name': name,
+      'email': email,
+      'password': password,
+      'uuid': uuid,
+    };
+
+    print(combinedData);
     // 회원가입 로직을 여기에 추가하세요
-    print('Name: $name, Email: $email, Password: $password');
   }
 }
 
@@ -43,7 +71,6 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
 
@@ -52,7 +79,7 @@ class RegisterPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        automaticallyImplyLeading: false, // 기본 뒤로 가기 버튼 제거
+        automaticallyImplyLeading: false,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Row(
@@ -85,9 +112,7 @@ class RegisterPage extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 60,
-                  ),
+                  const SizedBox(height: 60),
                   const Text(
                     '회원가입 👋',
                     style: TextStyle(
@@ -99,14 +124,11 @@ class RegisterPage extends StatelessWidget {
                   const Text(
                     'Your fullname*',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: Color(
-                          0xffd9d9d9,
-                        )),
+                      fontSize: 16,
+                      color: Color(0xffd9d9d9),
+                    ),
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
                   TextField(
                     onChanged: controller.updateName,
                     style: const TextStyle(color: Colors.white),
@@ -127,14 +149,11 @@ class RegisterPage extends StatelessWidget {
                   const Text(
                     'Email address*',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: Color(
-                          0xffd9d9d9,
-                        )),
+                      fontSize: 16,
+                      color: Color(0xffd9d9d9),
+                    ),
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
                   TextField(
                     onChanged: controller.updateEmail,
                     style: const TextStyle(color: Colors.white),
@@ -155,14 +174,11 @@ class RegisterPage extends StatelessWidget {
                   const Text(
                     'Password*',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: Color(
-                          0xffd9d9d9,
-                        )),
+                      fontSize: 16,
+                      color: Color(0xffd9d9d9),
+                    ),
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const SizedBox(height: 16),
                   TextField(
                     onChanged: controller.updatePassword,
                     obscureText: true,
@@ -186,19 +202,12 @@ class RegisterPage extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
-                        final combinedData = {
-                          ...previousData,
-                          'name': controller.name,
-                          'email': controller.email,
-                          'password': controller.password,
-                        };
-
-                        print(combinedData);
+                        controller.register(previousData);
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStateProperty.all(const Color(0xFFF2FE8D)),
+                        backgroundColor: WidgetStateProperty.all(
+                          const Color(0xFFF2FE8D),
+                        ),
                         shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4.0),
@@ -208,9 +217,10 @@ class RegisterPage extends StatelessWidget {
                       child: const Text(
                         '회원가입',
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
+import 'package:stretching/screen/diary/diary_entry_page2.dart';
+import 'package:stretching/screen/register/register_page1.dart';
+import 'package:stretching/screen/register/register_page2.dart';
+import 'package:stretching/screen/splash_page.dart';
+import 'package:stretching/screen/survey/survey_page2.dart';
 
-class DiaryEntryViewController3 extends GetxController {
-  String note = ''; // 사용자가 입력한 메모
+class RegisterViewController1_1 extends GetxController {
+  bool isAgreed = false; // 약관 동의 여부
 
-  // 메모 입력
-  void updateNote(String newNote) {
-    note = newNote;
+  // 약관 동의 상태 변경
+  void toggleAgreement() {
+    isAgreed = !isAgreed;
     update(); // 상태 업데이트
   }
 }
 
-class DiaryEntryPage3 extends StatelessWidget {
-  const DiaryEntryPage3({super.key});
+class RegisterPage1_1 extends StatelessWidget {
+  const RegisterPage1_1({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
-    // 이전 페이지에서 전달된 데이터 가져오기
-    final Map<String, dynamic> previousData =
-        Get.arguments as Map<String, dynamic>;
-
-    return GetBuilder<DiaryEntryViewController3>(
-      init: DiaryEntryViewController3(), // 컨트롤러 초기화
+    return GetBuilder<RegisterViewController1_1>(
+      init: RegisterViewController1_1(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -55,7 +55,7 @@ class DiaryEntryPage3 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    Get.off(() => const BottomNavigation());
+                    Get.to(() => const SplashPage());
                   },
                 ),
               ),
@@ -70,16 +70,7 @@ class DiaryEntryPage3 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '3/3 스트레스 일기장',
-                      style: TextStyle(
-                        color: Color(0xff929292),
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.start,
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      '오늘을 기록해보세요.',
+                      '스트레칭 서비스 이용을 위하여,\n다음의 항목에 동의해주세요',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -87,61 +78,53 @@ class DiaryEntryPage3 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    CheckboxListTile(
+                      title: const Text(
+                        '서비스이용약관 동의(필수)',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      value: controller.isAgreed,
+                      onChanged: (bool? value) {
+                        controller.toggleAgreement();
+                      },
+                      checkColor: Colors.black,
+                      activeColor: Colors.white,
+                    ),
+                    const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff4a4a4a),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: TextField(
-                        maxLength: 100,
-                        maxLines: 5,
-                        onChanged: (text) {
-                          controller.updateNote(text);
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: '오늘 하루를 간략하게 작성해주세요.',
-                          hintStyle: TextStyle(color: Color(0xff929292)),
-                          border: InputBorder.none,
+                      padding: const EdgeInsets.all(8.0),
+                      color: const Color(0xFF303030),
+                      child: const SingleChildScrollView(
+                        child: Text(
+                          '''개인정보 처리방침
+<스트레칭> (이하 ‘스트레칭’이라 함)은 [개인정보 보호법] 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
+
+○ 이 개인정보처리방침은 2023년 8월 11일부터 적용됩니다.
+
+제1조(개인정보의 처리 목적)
+
+<스트레칭>은 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
+
+1. **회원가입 및 관리**: 회원 가입의사 확인, 회원제 서비스 제공에 따른 본인 식별·인증, 회원자격 유지·관리, 서비스 부정이용 방지 목적으로 개인정보를 처리합니다.
+2. **서비스 제공**: 서비스 제공, 콘텐츠 제공을 목적으로 개인정보를 처리합니다.
+                    ''',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '${controller.note.length} / 100자 이내',
-                        style: const TextStyle(
-                          color: Color(0xff929292),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    ),
+                    const SizedBox(height: 50),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: controller.note.isNotEmpty
+                        onPressed: controller.isAgreed
                             ? () {
-                                // 완료 버튼 클릭 시 동작 및 데이터 업데이트
-                                final combinedData = {
-                                  ...previousData,
-                                  'note': controller.note
-                                };
-                                print(combinedData);
-
-                                navController.changeTabIndex(
-                                    1); // MainMatePage로 이동하도록 설정
-                                Get.to(() => const BottomNavigation(),
-                                    arguments: combinedData);
+                                // 다음 버튼 클릭 시 동작 및 다음 페이지로 이동
+                                Get.to(() => const RegisterPage1());
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: controller.note.isNotEmpty
+                          backgroundColor: controller.isAgreed
                               ? const Color(0xffbbffba)
                               : const Color(0xff4a4a4a),
                           shape: RoundedRectangleBorder(
@@ -149,7 +132,7 @@ class DiaryEntryPage3 extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          '완료',
+                          '다음',
                           style: TextStyle(
                             color: Color(0xff282828),
                             fontWeight: FontWeight.bold,
