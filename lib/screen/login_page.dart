@@ -1,10 +1,35 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:stretching/screen/bottom_navigation.dart';
+import 'package:stretching/screen/splash_page.dart';
 
 class LoginViewController extends GetxController {
   String email = '';
   String password = '';
+  String uuid = '';
+  var isLoading = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initUUID();
+  }
+
+  Future<void> _initUUID() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (GetPlatform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      uuid = androidInfo.id;
+    } else if (GetPlatform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      uuid = iosInfo.identifierForVendor!;
+    }
+    update();
+  }
 
   void updateEmail(String value) {
     email = value;
@@ -16,10 +41,9 @@ class LoginViewController extends GetxController {
     update();
   }
 
-  void login() {
+  Future<void> login() async {
     if (email.isEmpty || password.isEmpty) {
       Get.snackbar(
-        duration: const Duration(milliseconds: 500),
         'Error',
         '모든 필드를 채워주세요.',
         snackPosition: SnackPosition.BOTTOM,
@@ -28,8 +52,61 @@ class LoginViewController extends GetxController {
       );
       return;
     }
-    // 회원가입 로직을 여기에 추가하세요
-    print('Email: $email, Password: $password');
+
+    isLoading = true;
+    update(); // 로딩 시작
+
+    final loginData = {
+      "id": email,
+      "password": password,
+      "deviceId": uuid,
+    };
+
+    final url = Uri.parse(
+        'https://hermi.agong.duckdns.org/api/v1/users/login'); // 실제 URL을 확인하세요
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode(loginData);
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      isLoading = false;
+      update(); // 로딩 종료
+
+      if (response.statusCode == 201) {
+        // 성공적으로 로그인이 완료되었을 때의 처리
+        Get.snackbar(
+          'Success',
+          '로그인에 성공했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        print("Response Body: ${response.body}");
+        Get.offAll(() => const BottomNavigation()); // BottomNavigation으로 이동
+      } else {
+        // 서버로부터 에러 응답을 받았을 때의 처리
+        Get.snackbar(
+          'Error',
+          '로그인에 실패했습니다: ${response.reasonPhrase}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        print("Error Response: ${response.body}");
+      }
+    } catch (e) {
+      // 네트워크 에러 등 예외 발생 시의 처리
+      isLoading = false;
+      update(); // 로딩 종료
+      Get.snackbar(
+        'Error',
+        '로그인 중 에러가 발생했습니다: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      print("Exception: $e");
+    }
   }
 }
 
@@ -60,7 +137,7 @@ class LoginPage extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Get.offAll(const SplashPage());
                 },
               ),
             ],
@@ -73,102 +150,113 @@ class LoginPage extends StatelessWidget {
           child: GetBuilder<LoginViewController>(
             init: LoginViewController(),
             builder: (controller) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Stack(
                 children: [
-                  const SizedBox(
-                    height: 60,
-                  ),
-                  const Text(
-                    '로그인 👋',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    'Email address*',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Color(
-                          0xffd9d9d9,
-                        )),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  TextField(
-                    onChanged: controller.updateEmail,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Enter Email address*',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'john@gmail.com',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFF1F1F1F),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 60),
+                      const Text(
+                        '로그인 👋',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Password*',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Color(
-                          0xffd9d9d9,
-                        )),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  TextField(
-                    onChanged: controller.updatePassword,
-                    obscureText: true,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Enter Password*',
-                      labelStyle: const TextStyle(color: Colors.grey),
-                      hintText: 'Enter password',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFF1F1F1F),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4.0),
-                        borderSide: BorderSide.none,
+                      const SizedBox(height: 30),
+                      const Text(
+                        'Email address*',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xffd9d9d9),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.off(const BottomNavigation());
-                      },
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStateProperty.all(const Color(0xFF98FB98)),
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
+                      const SizedBox(height: 16),
+                      TextField(
+                        onChanged: controller.updateEmail,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: 'Enter Email address*',
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          hintText: 'john@gmail.com',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          filled: true,
+                          fillColor: const Color(0xFF1F1F1F),
+                          border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                       ),
-                      child: const Text(
-                        '로그인',
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Password*',
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          color: Color(0xffd9d9d9),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        onChanged: controller.updatePassword,
+                        obscureText: true,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: 'Enter Password*',
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          hintText: 'Enter password',
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          filled: true,
+                          fillColor: const Color(0xFF1F1F1F),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 50),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            //controller.login;
+                            Get.offAll(const BottomNavigation());
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                              const Color(0xFF98FB98),
+                            ),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            '로그인',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (controller.isLoading)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black.withOpacity(0.7),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.green),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
                 ],
               );
             },

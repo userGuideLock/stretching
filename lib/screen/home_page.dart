@@ -1,19 +1,12 @@
-import 'dart:io';
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/material.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-
-enum AppState {
-  DATA_NOT_FETCHED, // 데이터가 가져오지 않음
-  FETCHING_DATA, // 데이터 가져오는 중
-  DATA_READY, // 데이터 준비 완료
-  NO_DATA, // 데이터 없음
-  AUTHORIZED, // 권한 부여됨
-  AUTH_NOT_GRANTED, // 권한 부여되지 않음
-  AUTH_REQUIRED, // 사용자가 로그인 해야함
-}
+import 'package:stretching/health/health_page.dart';
+import 'package:stretching/screen/stress/stress_page1.dart';
 
 class HomeViewController extends GetxController {
   final Health _health = Health();
@@ -28,14 +21,16 @@ class HomeViewController extends GetxController {
   var deepSleepMinutes = 0;
   var lightSleepMinutes = 0;
   var remSleepMinutes = 0;
-  var averageHeartRate = 0.0; // 평균값 초기화
-  var respiratoryRate = 0.0; // 평균값 초기화
-  var stressScore = 0; // 초기 스트레스 점수
+  var averageHeartRate = 0.0;
+  var respiratoryRate = 0.0;
+  var stressScore = 0;
   DateTime? lastFetchTime;
 
   DateTime? stepsFetchTime;
   DateTime? sleepFetchTime;
   DateTime? heartRateFetchTime;
+
+  var isLoading = false.obs;
 
   static final types = [
     HealthDataType.STEPS,
@@ -63,12 +58,11 @@ class HomeViewController extends GetxController {
     if (connectivityResult == ConnectivityResult.none) {
       _showInternetSnackbar();
     } else {
-      await authorize(); // 인터넷 연결되어 있으면 권한 확인 및 데이터 가져오기
+      await authorize();
     }
   }
 
   Future<void> authorize() async {
-    // 모든 관련 권한 요청
     await Permission.activityRecognition.request();
     await Permission.location.request();
     await Permission.sensors.request();
@@ -119,18 +113,16 @@ class HomeViewController extends GetxController {
     deepSleepMinutes = 0;
     lightSleepMinutes = 0;
     remSleepMinutes = 0;
-    averageHeartRate = 0.0; // 평균값 초기화
-    respiratoryRate = 0.0; // 평균값 초기화
+    averageHeartRate = 0.0;
+    respiratoryRate = 0.0;
 
     try {
-      // 걸음수 데이터 가져오기 (오늘)
       List<HealthDataPoint> stepsData = await _health.getHealthDataFromTypes(
         types: [HealthDataType.STEPS],
         startTime: todayStart,
         endTime: now,
       );
 
-      // 나머지 데이터 가져오기 (한 달 이내)
       List<HealthDataPoint> otherData = await _health.getHealthDataFromTypes(
         types: types.where((type) => type != HealthDataType.STEPS).toList(),
         startTime: monthStart,
@@ -143,8 +135,8 @@ class HomeViewController extends GetxController {
       healthDataList.addAll(stepsData);
       healthDataList.addAll(otherData);
       _calculateTotals();
-      lastFetchTime = now; // 데이터 가져온 시간 저장
-      stressScore = calculateTotalScore(); // 스트레스 점수 업데이트
+      lastFetchTime = now;
+      stressScore = calculateTotalScore();
     } catch (error) {
       debugPrint("getHealthDataFromTypes에서 예외 발생: $error");
     }
@@ -196,13 +188,13 @@ class HomeViewController extends GetxController {
     if (heartRateCount > 0) {
       averageHeartRate /= heartRateCount;
     } else {
-      averageHeartRate = 0; // 기본 평균값 사용
+      averageHeartRate = 0;
     }
 
     if (respiratoryRateCount > 0) {
       respiratoryRate /= respiratoryRateCount;
     } else {
-      respiratoryRate = 0; // 기본 평균값 사용
+      respiratoryRate = 0;
     }
   }
 
@@ -351,6 +343,10 @@ class HomeViewController extends GetxController {
       duration: const Duration(seconds: 5),
     );
   }
+
+  void onMeasureStressPressed() async {
+    Get.to(() => const StressPage1());
+  }
 }
 
 class HomePage extends StatelessWidget {
@@ -401,25 +397,42 @@ class HomePage extends StatelessWidget {
                           fontSize: 24,
                           fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     const Text(
-                      '수면, 심박수, 심전도 및 사용자의 선택한 데이터를 기반으로\n스트레스 점수를 계산합니다.',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                      '수면, 심박수, 심전도 및 사용자의 선택한 데이터를 기반으로 스트레스 점수를 계산합니다.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildDataBox(
-                      icon: controller.state == AppState.NO_DATA
-                          ? Icons.help_outline
-                          : Icons.emoji_emotions,
-                      title: '스트레스 점수',
-                      value: controller.state == AppState.NO_DATA
-                          ? '가져올 데이터가 없습니다.'
-                          : '${controller.stressScore} / 100',
-                      subTitle: '',
-                      fetchTime: controller.lastFetchTime,
-                      image: 'images/home_page_box.png',
+                    const SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: controller.onMeasureStressPressed,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: const Color(0xFF1F1F1F),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              child: const Text(
+                                '오늘의 스트레스 측정하러 가기',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 30),
                     _buildDataBox(
                       icon: Icons.directions_walk,
                       title: '걸음수',
