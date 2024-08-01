@@ -76,7 +76,7 @@ class SurveyPage21 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '21/22. 일상 루틴',
+                      '11/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,24 +85,21 @@ class SurveyPage21 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달간 당신이 "잠잘 때" 숨을\n한동안 멈추고 다시 숨쉬기를 자주 했는지 물어보십시오',
+                      '지난 한달 동안, 당신은 전반적으로 수면의 질이 어느 정도라고 평가하십니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '지난 한 달 동안 없었다.'),
+                    _buildButton(controller, '매우 좋음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1번보다 적게'),
+                    _buildButton(controller, '상당히 좋음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1~2번 정도'),
+                    _buildButton(controller, '상당히 나쁨'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 3번 이상'),
+                    _buildButton(controller, '매우 나쁨'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

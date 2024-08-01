@@ -2,6 +2,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart'; // Add this import
 import 'dart:convert';
 
 import 'package:stretching/screen/bottom_navigation.dart';
@@ -63,7 +64,7 @@ class LoginViewController extends GetxController {
     };
 
     final url = Uri.parse(
-        'https://hermi.agong.duckdns.org/api/v1/users/login'); // 실제 URL을 확인하세요
+        'https://hermi.danjam.site/api/v1/users/login'); // 실제 URL을 확인하세요
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode(loginData);
 
@@ -82,6 +83,13 @@ class LoginViewController extends GetxController {
           colorText: Colors.white,
         );
         print("Response Body: ${response.body}");
+
+        final userId = loginData['id'].toString();
+
+        // SharedPreferences에 userId 저장
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userId', userId);
+
         Get.offAll(() => const BottomNavigation()); // BottomNavigation으로 이동
       } else {
         // 서버로부터 에러 응답을 받았을 때의 처리
@@ -219,10 +227,8 @@ class LoginPage extends StatelessWidget {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: () {
-                            //controller.login;
-                            Get.offAll(const BottomNavigation());
-                          },
+                          onPressed:
+                              controller.login, // Login button click event
                           style: ButtonStyle(
                             backgroundColor: WidgetStateProperty.all(
                               const Color(0xFF98FB98),

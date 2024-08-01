@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
+import 'package:stretching/screen/survey/survey_page23.dart';
 import 'package:stretching/screen/survey/survey_page4.dart';
 
 class SurveyViewController22 extends GetxController {
@@ -75,7 +76,7 @@ class SurveyPage22 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '22/22. 일상 루틴',
+                      '12/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -84,24 +85,21 @@ class SurveyPage22 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달간 당신이 "잠잘 때" 시간, 장소, 상황을 인식하지 못하거나\n혼란스러워 함을 자주 했는지 물어보십시오.',
+                      '12/14. 수면 스트레스 지난 한달 동안, 당신은 잠이 들기 위해 얼마나 자주 약을 복용했습니까?(처방약 또는 약국에서 구입한 약)',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '지난 한 달 동안 없었다.'),
+                    _buildButton(controller, '지난 한달 동안 없었다 (없다)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1번보다 적게'),
+                    _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1~2번 정도'),
+                    _buildButton(controller, '한 주에 1~2번 정도(주 1~2회)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 3번 이상'),
+                    _buildButton(controller, '한 주에 3번 이상(주 3회 이상)'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
@@ -114,10 +112,8 @@ class SurveyPage22 extends StatelessWidget {
                                   ...previousData,
                                   'step22': controller.selectedButton
                                 };
-                                navController.changeTabIndex(
-                                    1); // MainMatePage로 이동하도록 설정
 
-                                Get.to(() => const BottomNavigation(),
+                                Get.to(() => const SurveyPage23(),
                                     arguments: combinedData);
                                 print(combinedData);
                               }

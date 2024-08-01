@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stretching/screen/survey/survey_main_page.dart';
 import 'package:stretching/screen/survey/survey_page1.dart';
 
 class SurvayViewController extends GetxController {}
@@ -41,7 +42,7 @@ class SurveyPage extends StatelessWidget {
             const Column(
               children: [
                 Text(
-                  '나도 모르게 \n생기는 스트레스 \n더 자세히 알아볼까요?',
+                  '나도 모르게 생기는 스트레스 \n더 자세히 알아볼까요?',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -56,17 +57,17 @@ class SurveyPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Image.asset(
-              'images/survey_page_img.png',
+              'images/splash_page_star.png',
             ),
             const SizedBox(
-              height: 20,
+              height: 80,
             ),
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.to(const SurveyPage1());
+                  Get.to(const SurveyMainPage());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffbbffba),

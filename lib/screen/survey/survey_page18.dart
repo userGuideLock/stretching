@@ -76,7 +76,7 @@ class SurveyPage18 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '18/22. 일상 루틴',
+                      '8/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage18 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신은 운전하거나, 식사 때 혹은 사회활동을 하는 동안\n얼마나 자주 졸음을 느꼈습니까?',
+                      '지난 한달 동안, 당신은 아래의 이유로 잠자는 데 얼마나 자주 문제가 있었습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -95,14 +95,22 @@ class SurveyPage18 extends StatelessWidget {
                     const SizedBox(
                       height: 15,
                     ),
+                    const Text(
+                      '나쁜 꿈을 꾸었다.',
+                      style: TextStyle(
+                        color: Color(0xfff0f0f0),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '지난 한달 동안 없었다.'),
+                    _buildButton(controller, '지난 한달 동안 없었다 (없다)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1번보다 적게'),
+                    _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1~2번 정도'),
+                    _buildButton(controller, '한 주에 1~2번 정도(주 1~2회)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 3번 이상'),
+                    _buildButton(controller, '한 주에 3번 이상(주 3회 이상)'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

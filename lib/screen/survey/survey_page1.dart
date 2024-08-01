@@ -23,7 +23,6 @@ class SurveyPage1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     return GetBuilder<SurveyViewController1>(
       init: SurveyViewController1(), // 컨트롤러 초기화
       builder: (controller) {
@@ -57,7 +56,6 @@ class SurveyPage1 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
                     Get.to(() => const BottomNavigation());
                   },
                 ),
@@ -73,7 +71,7 @@ class SurveyPage1 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '1/22 기본 정보 및 신체건강',
+                      '1/10 스트레스 측정',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -82,7 +80,7 @@ class SurveyPage1 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 평소\n몇시에 잠자리에 들었습니까?',
+                      '최근 1개월 동안, 예상치 못했던 일 때문에 당황했던 적이 얼마나 있었습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -90,13 +88,15 @@ class SurveyPage1 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오전 6시 - 오전 12시'),
+                    _buildButton(controller, '전혀없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오후 12시 - 오후 6시'),
+                    _buildButton(controller, '거의없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오후 6시 - 오후 12시'),
+                    _buildButton(controller, '때떄로 있음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '오전 12시 - 오전 6시'),
+                    _buildButton(controller, '자주있음'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '매우자주'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

@@ -76,7 +76,7 @@ class SurveyPage9 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '9/22. 일상 루틴',
+                      '9/10 스트레스 측정',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,32 +85,23 @@ class SurveyPage9 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신은 아래의 이유로 취침의 문제가 있었습니까?',
+                      '최근 1개월 동안, 당신이 통제할 수 없는 일 때문에 화가 난 경험이 얼마나 있었습니까? ',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
                         fontSize: 24,
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    const Text(
-                      '기침을 하거나 시끄럽게\n코를 골았다.',
-                      style: TextStyle(
-                        color: Color(0xfff0f0f0),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '지난 한달 동안 없었다'),
+                    _buildButton(controller, '전혀없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
+                    _buildButton(controller, '거의없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 1~2번 정도(주 1~2회)'),
+                    _buildButton(controller, '때떄로 있음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '한 주에 3번 이상(주 3회 이상)'),
+                    _buildButton(controller, '자주있음'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '매우자주'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

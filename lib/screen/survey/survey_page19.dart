@@ -76,7 +76,7 @@ class SurveyPage19 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '19/22. 일상 루틴',
+                      '9/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage19 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신은 일에 열중하는데 얼마나 많은 문제가 있었습니까?',
+                      '지난 한달 동안, 당신은 아래의 이유로 잠자는 데 얼마나 자주 문제가 있었습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -95,14 +95,22 @@ class SurveyPage19 extends StatelessWidget {
                     const SizedBox(
                       height: 15,
                     ),
+                    const Text(
+                      '통증이 있었다.',
+                      style: TextStyle(
+                        color: Color(0xfff0f0f0),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '전혀 없었다.'),
+                    _buildButton(controller, '지난 한달 동안 없었다 (없다)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '매우 조금 있었다.'),
+                    _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '다소 있었다.'),
+                    _buildButton(controller, '한 주에 1~2번 정도(주 1~2회)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '매우 많이 있었다.'),
+                    _buildButton(controller, '한 주에 3번 이상(주 3회 이상)'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

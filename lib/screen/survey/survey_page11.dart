@@ -76,7 +76,7 @@ class SurveyPage11 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '11/22. 일상 루틴',
+                      '1/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage11 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신은 아래의 이유로 취침의 문제가 있었습니까?',
+                      '지난 한달 동안, 당신은 아래의 이유로 잠자는 데 얼마나 자주 문제가 있었습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -96,7 +96,7 @@ class SurveyPage11 extends StatelessWidget {
                       height: 15,
                     ),
                     const Text(
-                      '너무 덥다고 느꼈다.',
+                      '취침 후 30분 이내에 잠들 수 없었다.',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class SurveyPage11 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '지난 한달 동안 없었다'),
+                    _buildButton(controller, '지난 한달 동안 없었다 (없다)'),
                     const SizedBox(height: 16),
                     _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
                     const SizedBox(height: 16),

@@ -70,11 +70,11 @@ class RegisterViewController extends GetxController {
       "gender": previousData['stepOne'],
       "job": previousData['stepTwo'],
       "age": previousData['stepThree'],
-      "hobby": previousData['stepFour'].toString(),
+      "hobby": previousData['stepFour'],
       "deviceId": uuid, // deviceId로 uuid를 보냄
     };
 
-    final url = Uri.parse('https://hermi.agong.duckdns.org/api/v1/users/join');
+    final url = Uri.parse('https://hermi.danjam.site/api/v1/users/join');
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode(combinedData);
 

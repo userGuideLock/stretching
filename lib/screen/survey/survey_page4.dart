@@ -76,7 +76,7 @@ class SurveyPage4 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '4/22. 일상 루틴',
+                      '4/10 스트레스 측정',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage4 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신이 밤에 실제로\n잠잔 시간은 얼마나 됩니까?',
+                      '최근 1개월 동안, 당신의 개인적 문제들을 다루는데 있어서 얼마나 자주 자신감을 느끼셨습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -93,13 +93,15 @@ class SurveyPage4 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '3시간 이내'),
+                    _buildButton(controller, '전혀없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '6시간 이내'),
+                    _buildButton(controller, '거의없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '12시간 이내'),
+                    _buildButton(controller, '때떄로 있음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '12시간 이상'),
+                    _buildButton(controller, '자주있음'),
+                    const SizedBox(height: 16),
+                    _buildButton(controller, '매우자주'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
@@ -110,7 +112,7 @@ class SurveyPage4 extends StatelessWidget {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 final combinedData = {
                                   ...previousData,
-                                  'stepFour': controller.selectedButton
+                                  'step4': controller.selectedButton
                                 };
                                 Get.to(() => const SurveyPage5(),
                                     arguments: combinedData);

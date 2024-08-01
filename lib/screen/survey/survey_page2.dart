@@ -77,7 +77,7 @@ class SurveyPage2 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '2/22 기본 정보 및 신체건강',
+                      '2/10 스트레스 측정',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -86,7 +86,7 @@ class SurveyPage2 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 평소 잠이 들기까지 \n얼마나 오래 걸렸습니까?',
+                      '최근 1개월 동안, 인생에서 중요한 일들을 조절할 수 없다는 느낌을 얼마나 경험하였습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -94,17 +94,15 @@ class SurveyPage2 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '10분 이내'),
+                    _buildButton(controller, '전혀없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '20분 이내'),
+                    _buildButton(controller, '거의없음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '30분 이내'),
+                    _buildButton(controller, '때떄로 있음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '1시간 이내'),
+                    _buildButton(controller, '자주있음'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '2시간 이내'),
-                    const SizedBox(height: 16),
-                    _buildButton(controller, '2시간 이상'),
+                    _buildButton(controller, '매우자주'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,

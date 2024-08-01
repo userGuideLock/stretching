@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
-import 'package:stretching/screen/survey/survey_page21.dart';
+import 'package:stretching/screen/survey/survey_page24.dart';
 import 'package:stretching/screen/survey/survey_page4.dart';
 
-class SurveyViewController20 extends GetxController {
+class SurveyViewController23 extends GetxController {
   String selectedButton = ''; // 선택된 버튼
 
   // 버튼 선택
@@ -18,8 +18,8 @@ class SurveyViewController20 extends GetxController {
   }
 }
 
-class SurveyPage20 extends StatelessWidget {
-  const SurveyPage20({super.key});
+class SurveyPage23 extends StatelessWidget {
+  const SurveyPage23({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +27,8 @@ class SurveyPage20 extends StatelessWidget {
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
-    return GetBuilder<SurveyViewController20>(
-      init: SurveyViewController20(), // 컨트롤러 초기화
+    return GetBuilder<SurveyViewController23>(
+      init: SurveyViewController23(), // 컨트롤러 초기화
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.black,
@@ -76,7 +76,7 @@ class SurveyPage20 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '10/14. 수면 스트레스',
+                      '13/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage20 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안, 이때까지 조사한 내용들로 인하여 잠자는 데 얼마나 자주 어려움이 있었습니까?',
+                      '지난 한달 동안, 당신은 운전하거나, 식사 때 혹은 사회활동을 하는 동안 얼마나 자주 졸음을 느꼈습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -110,9 +110,12 @@ class SurveyPage20 extends StatelessWidget {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 final combinedData = {
                                   ...previousData,
-                                  'step20': controller.selectedButton
+                                  'step23': controller.selectedButton
                                 };
-                                Get.to(() => const SurveyPage21(),
+                                navController.changeTabIndex(
+                                    1); // MainMatePage로 이동하도록 설정
+
+                                Get.to(() => const SurveyPage24(),
                                     arguments: combinedData);
                                 print(combinedData);
                               }
@@ -147,8 +150,8 @@ class SurveyPage20 extends StatelessWidget {
   }
 }
 
-Widget _buildButton(SurveyViewController20 controller, String buttonLabel) {
-  return GetBuilder<SurveyViewController20>(
+Widget _buildButton(SurveyViewController23 controller, String buttonLabel) {
+  return GetBuilder<SurveyViewController23>(
     builder: (_) {
       return SizedBox(
         width: double.infinity,

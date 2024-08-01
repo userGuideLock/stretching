@@ -76,7 +76,7 @@ class SurveyPage16 extends StatelessWidget {
                   children: [
                     const SizedBox(height: 50),
                     const Text(
-                      '16/22. 일상 루틴',
+                      '6/14. 수면 스트레스',
                       style: TextStyle(
                         color: Color(0xff929292),
                         fontSize: 16,
@@ -85,7 +85,7 @@ class SurveyPage16 extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     const Text(
-                      '지난 한달 동안 당신은 전반적으로\n수면의 징리 어느 정도라고 평가합니까?',
+                      '지난 한달 동안, 당신은 아래의 이유로 잠자는 데 얼마나 자주 문제가 있었습니까?',
                       style: TextStyle(
                         color: Color(0xfff0f0f0),
                         fontWeight: FontWeight.bold,
@@ -95,14 +95,22 @@ class SurveyPage16 extends StatelessWidget {
                     const SizedBox(
                       height: 15,
                     ),
+                    const Text(
+                      '너무 춥다고 느꼈다.',
+                      style: TextStyle(
+                        color: Color(0xfff0f0f0),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '매우 좋음'),
+                    _buildButton(controller, '지난 한달 동안 없었다 (없다)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '상당히 좋음'),
+                    _buildButton(controller, '한 주에 1번보다 적게(주 1회미만)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '상당히 나쁨'),
+                    _buildButton(controller, '한 주에 1~2번 정도(주 1~2회)'),
                     const SizedBox(height: 16),
-                    _buildButton(controller, '매우 나쁨'),
+                    _buildButton(controller, '한 주에 3번 이상(주 3회 이상)'),
                     const SizedBox(height: 60),
                     SizedBox(
                       width: double.infinity,
