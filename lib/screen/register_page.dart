@@ -1,6 +1,6 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -12,7 +12,7 @@ class RegisterViewController extends GetxController {
   String email = '';
   String password = '';
   String uuid = '';
-  var isLoading = false;
+  var isLoading = false.obs;
 
   @override
   void onInit() {
@@ -24,10 +24,9 @@ class RegisterViewController extends GetxController {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (GetPlatform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      uuid = androidInfo.id;
-    } else if (GetPlatform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      uuid = iosInfo.identifierForVendor!;
+      uuid =
+          "${androidInfo.board}-${androidInfo.bootloader}-${androidInfo.brand}-${androidInfo.device}";
+      print("Generated UUID: $uuid");
     }
     update();
   }
@@ -50,18 +49,18 @@ class RegisterViewController extends GetxController {
   Future<void> register(Map<String, dynamic> previousData) async {
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       Get.snackbar(
-        duration: const Duration(milliseconds: 1000),
         'Error',
         '모든 필드를 채워주세요.',
+        duration: const Duration(seconds: 2),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;
     }
 
-    isLoading = true;
-    update(); // 로딩 시작
+    isLoading.value = true;
+    update();
 
     final combinedData = {
       "id": name,
@@ -71,7 +70,7 @@ class RegisterViewController extends GetxController {
       "job": previousData['stepTwo'],
       "age": previousData['stepThree'],
       "hobby": previousData['stepFour'],
-      "deviceId": uuid, // deviceId로 uuid를 보냄
+      "deviceId": uuid,
     };
 
     final url = Uri.parse('https://hermi.danjam.site/api/v1/users/join');
@@ -80,11 +79,10 @@ class RegisterViewController extends GetxController {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-      isLoading = false;
-      update(); // 로딩 종료
+      isLoading.value = false;
+      update();
 
       if (response.statusCode == 201) {
-        // 성공적으로 회원가입이 완료되었을 때의 처리
         Get.snackbar(
           'Success',
           '회원가입이 완료되었습니다.',
@@ -92,10 +90,8 @@ class RegisterViewController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        print("Response Body: ${response.body}");
-        Get.offAll(const LoginPage()); // LoginPage로 이동
+        Get.offAll(const LoginPage());
       } else {
-        // 서버로부터 에러 응답을 받았을 때의 처리
         Get.snackbar(
           'Error',
           '회원가입에 실패했습니다: ${response.reasonPhrase}',
@@ -103,12 +99,10 @@ class RegisterViewController extends GetxController {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        print("Error Response: ${response.body}");
       }
     } catch (e) {
-      // 네트워크 에러 등 예외 발생 시의 처리
-      isLoading = false;
-      update(); // 로딩 종료
+      isLoading.value = false;
+      update();
       Get.snackbar(
         'Error',
         '회원가입 중 에러가 발생했습니다: $e',
@@ -116,7 +110,6 @@ class RegisterViewController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-      print("Exception: $e");
     }
   }
 }
@@ -261,14 +254,10 @@ class RegisterPage extends StatelessWidget {
                           onPressed: () {
                             controller.register(previousData);
                           },
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                              const Color(0xFFF2FE8D),
-                            ),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFF2FE8D),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
                             ),
                           ),
                           child: const Text(
@@ -283,7 +272,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (controller.isLoading)
+                  if (controller.isLoading.value)
                     Positioned.fill(
                       child: Container(
                         color: Colors.black.withOpacity(0.7),

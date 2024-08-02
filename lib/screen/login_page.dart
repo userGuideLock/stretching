@@ -24,10 +24,8 @@ class LoginViewController extends GetxController {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (GetPlatform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      uuid = androidInfo.id;
-    } else if (GetPlatform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      uuid = iosInfo.identifierForVendor!;
+      uuid =
+          "${androidInfo.board}-${androidInfo.bootloader}-${androidInfo.brand}-${androidInfo.device}";
     }
     update();
   }
