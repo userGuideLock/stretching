@@ -1,12 +1,15 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stretching/health/health_page.dart';
 import 'package:stretching/screen/stress/stress_page1.dart';
+import 'package:stretching/screen/stress/stress_score_page.dart';
+import 'package:http/http.dart' as http;
 
 class HomeViewController extends GetxController {
   final Health _health = Health();
@@ -23,7 +26,7 @@ class HomeViewController extends GetxController {
   var remSleepMinutes = 0;
   var averageHeartRate = 0.0;
   var respiratoryRate = 0.0;
-  var stressScore = 0;
+  var stressScore = 0; // 스트레스 점수를 일반 변수로 변경
   DateTime? lastFetchTime;
 
   DateTime? stepsFetchTime;
@@ -87,10 +90,57 @@ class HomeViewController extends GetxController {
       _showAuthorizationSnackbar();
     } else {
       fetchHealthData();
+      fetchStressScore(); // 스트레스 점수를 가져오는 함수 호출
+    }
+  }
+
+  Future<void> fetchStressScore() async {
+    var now = DateTime.now();
+    var formattedDate =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userId = prefs.getString('userId');
+
+    var url = Uri.parse(
+        'https://hermi.danjam.site/api/v1/stress/record/checktoday/$userId?date=$formattedDate');
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var responseBody = json.decode(response.body);
+        print(responseBody);
+        if (responseBody['score'] != null) {
+          stressScore = responseBody['score'];
+          update(); // 업데이트 호출
+        }
+      } else if (response.statusCode == 400) {
+        var responseBody = json.decode(response.body);
+        print(responseBody);
+        if (responseBody['code'] == 1) {
+          Get.snackbar(
+            'Error',
+            'User not found',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'API request failed: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
   Future<void> fetchHealthData() async {
+    fetchStressScore();
     if (state != AppState.AUTHORIZED) {
       await authorize();
     }
@@ -136,7 +186,6 @@ class HomeViewController extends GetxController {
       healthDataList.addAll(otherData);
       _calculateTotals();
       lastFetchTime = now;
-      stressScore = calculateTotalScore();
     } catch (error) {
       debugPrint("getHealthDataFromTypes에서 예외 발생: $error");
     }
@@ -267,38 +316,6 @@ class HomeViewController extends GetxController {
     }
   }
 
-  int calculateTotalScore() {
-    int sleepScore = calculateSleepScore();
-    double deepSleepPercentage = totalSleepMinutes == 0
-        ? 0
-        : (deepSleepMinutes / totalSleepMinutes) * 100;
-    double remSleepPercentage = totalSleepMinutes == 0
-        ? 0
-        : (remSleepMinutes / totalSleepMinutes) * 100;
-    double lightSleepPercentage = totalSleepMinutes == 0
-        ? 0
-        : (lightSleepMinutes / totalSleepMinutes) * 100;
-
-    int deepSleepScore =
-        calculateSleepStageScore(deepSleepMinutes, deepSleepPercentage);
-    int remSleepScore =
-        calculateSleepStageScore(remSleepMinutes, remSleepPercentage);
-    int lightSleepScore =
-        calculateSleepStageScore(lightSleepMinutes, lightSleepPercentage);
-
-    int sleepAwakeScore = calculateSleepAwakeScore();
-    int heartRateScore = calculateHeartRateScore();
-    int respiratoryRateScore = calculateRespiratoryRateScore();
-
-    return sleepScore +
-        deepSleepScore +
-        remSleepScore +
-        lightSleepScore +
-        sleepAwakeScore +
-        heartRateScore +
-        respiratoryRateScore;
-  }
-
   void _showAuthorizationSnackbar() {
     Get.snackbar(
       '권한이 필요합니다',
@@ -344,19 +361,49 @@ class HomeViewController extends GetxController {
     );
   }
 
-  void onMeasureStressPressed() async {
+  void onMeasureStressPressed() {
     Get.to(() => const StressPage1());
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final controller = Get.put(HomeViewController());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchStressScore(); // 화면이 보일 때마다 스트레스 점수를 가져옴
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeViewController>(
-      init: HomeViewController(),
       builder: (controller) {
+        String stressLevel;
+        String stressMessage;
+        Color stressColor;
+
+        if (controller.stressScore <= 30) {
+          stressLevel = '좋음';
+          stressMessage = '스트레스가 거의 없습니다. 계속 이렇게 유지하세요!';
+          stressColor = const Color(0xffacdcb4);
+        } else if (controller.stressScore <= 70) {
+          stressLevel = '보통';
+          stressMessage = '약간의 스트레스가 있습니다. 조심하세요!';
+          stressColor = Colors.orange;
+        } else {
+          stressLevel = '나쁨';
+          stressMessage = '스트레스가 많이 쌓였습니다. 휴식이 필요합니다!';
+          stressColor = Colors.red;
+        }
+
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
@@ -405,6 +452,65 @@ class HomePage extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
+                    const SizedBox(height: 30),
+                    controller.stressScore > 0
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    stressLevel,
+                                    style: TextStyle(
+                                      color: stressColor,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    '이에요.',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 32),
+                              LinearProgressIndicator(
+                                value: controller.stressScore / 100,
+                                backgroundColor: Colors.grey[800],
+                                color: stressColor,
+                                minHeight: 20,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(4)),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '100/${controller.stressScore}',
+                                    style: TextStyle(
+                                      color: stressColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                stressMessage,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          )
+                        : Container(),
                     const SizedBox(height: 30),
                     Row(
                       children: [

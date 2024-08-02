@@ -22,7 +22,6 @@ class DiaryEntryPage1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     return GetBuilder<DiaryEntryViewController1>(
       init: DiaryEntryViewController1(), // 컨트롤러 초기화
       builder: (controller) {

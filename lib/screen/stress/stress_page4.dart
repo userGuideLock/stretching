@@ -1,6 +1,7 @@
 // stressPage4.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/stress/stress_score_page.dart';
 
@@ -141,7 +142,7 @@ class StressPage4 extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: controller.selectedButton.isNotEmpty
-                          ? () {
+                          ? () async {
                               final combinedData = {
                                 ...previousData,
                                 'step3': controller.selectedButton
@@ -156,8 +157,16 @@ class StressPage4 extends StatelessWidget {
                               int stressScore =
                                   step1Score + step2Score + step3Score;
 
+                              // SharedPreferences에 userId 저장
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              var userId = prefs.getString('userId');
+
                               Get.to(
-                                () => StressScorePage(stressScore: stressScore),
+                                () => StressScorePage(
+                                  stressScore: stressScore,
+                                  userId: userId.toString(),
+                                ),
                                 arguments: combinedData,
                               );
                             }

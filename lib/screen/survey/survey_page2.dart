@@ -23,7 +23,6 @@ class SurveyPage2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
@@ -61,7 +60,6 @@ class SurveyPage2 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(2); // MainMatePage로 이동하도록 설정
                     Get.to(() => const BottomNavigation());
                   },
                 ),

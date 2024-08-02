@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/survey/%08survey_result_page.dart';
 
@@ -86,6 +89,31 @@ class SurveyViewController24 extends GetxController {
 
     return score;
   }
+
+  Future<void> sendSurveyScore(int score) async {
+    final url = Uri.parse('https://hermi.danjam.site/api/v1/surveyscore');
+    final headers = {'Content-Type': 'application/json'};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('User ID not found in SharedPreferences');
+      return;
+    }
+
+    final body = json.encode({'userId': userId, 'score': score});
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Survey score sent successfully');
+      } else {
+        print('Failed to send survey score: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error sending survey score: $e');
+    }
+  }
 }
 
 class SurveyPage24 extends StatelessWidget {
@@ -93,10 +121,10 @@ class SurveyPage24 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
+
     return GetBuilder<SurveyViewController24>(
       init: SurveyViewController24(), // 컨트롤러 초기화
       builder: (controller) {
@@ -130,7 +158,6 @@ class SurveyPage24 extends StatelessWidget {
                   icon: const Icon(Icons.close),
                   color: const Color.fromARGB(255, 255, 255, 255),
                   onPressed: () {
-                    navController.changeTabIndex(1); // MainMatePage로 이동하도록 설정
                     Get.to(() => const BottomNavigation());
                   },
                 ),
@@ -176,7 +203,7 @@ class SurveyPage24 extends StatelessWidget {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: controller.selectedButton.isNotEmpty
-                            ? () {
+                            ? () async {
                                 // 완료 버튼 클릭 시 동작 및 다음 페이지로 이동
                                 final combinedData = {
                                   ...previousData,
@@ -186,8 +213,11 @@ class SurveyPage24 extends StatelessWidget {
                                 int score =
                                     controller.calculateScore(combinedData);
 
-                                Get.to(() => SurveyResultPage(score: score),
-                                    arguments: combinedData);
+                                await controller.sendSurveyScore(score);
+
+                                Get.to(
+                                  () => SurveyResultPage(score: score),
+                                );
                               }
                             : null,
                         style: ElevatedButton.styleFrom(

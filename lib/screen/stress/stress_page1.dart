@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
 import 'package:stretching/screen/stress/stress_page2.dart';
 import 'package:stretching/screen/stress/stress_score_page.dart';
@@ -127,9 +128,16 @@ class StressViewController1 extends GetxController {
         throw '점수에 필요한 데이터가 부족합니다.';
       }
 
+      // SharedPreferences에 userId 저장
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString('userId');
+
       _calculateTotals();
       stressScore = calculateTotalScore();
-      Get.to(() => StressScorePage(stressScore: stressScore));
+      Get.to(() => StressScorePage(
+            stressScore: stressScore,
+            userId: userId.toString(),
+          ));
     } catch (e) {
       hasError = true;
       errorMessage = '점수에 필요한 데이터가 부족합니다.';
