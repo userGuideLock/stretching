@@ -368,7 +368,17 @@ class HomeViewController extends GetxController {
   }
 
   void onMeasureStressPressed() {
-    Get.to(() => const StressPage1());
+    Get.to(() => StressPage1(
+          totalSteps: totalSteps,
+          totalSleepMinutes: totalSleepMinutes,
+          asleepMinutes: asleepMinutes,
+          awakeMinutes: awakeMinutes,
+          deepSleepMinutes: deepSleepMinutes,
+          lightSleepMinutes: lightSleepMinutes,
+          remSleepMinutes: remSleepMinutes,
+          averageHeartRate: averageHeartRate,
+          respiratoryRate: respiratoryRate,
+        ));
   }
 }
 

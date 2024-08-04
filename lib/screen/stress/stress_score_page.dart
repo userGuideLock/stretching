@@ -11,11 +11,8 @@ class StressScorePage extends StatelessWidget {
   final int stressScore;
   final String userId;
 
-  const StressScorePage({
-    super.key,
-    required this.stressScore,
-    required this.userId,
-  });
+  const StressScorePage(
+      {super.key, required this.stressScore, required this.userId});
 
   @override
   Widget build(BuildContext context) {
