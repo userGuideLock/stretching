@@ -3,12 +3,12 @@ import 'package:get/get.dart';
 import 'package:stretching/screen/bottom_navigation.dart';
 
 class StressScoreLogPage extends StatelessWidget {
-  const StressScoreLogPage({super.key});
+  final List<dynamic> stressScores;
+
+  const StressScoreLogPage({super.key, required this.stressScores});
 
   @override
   Widget build(BuildContext context) {
-    final stressScores = Get.arguments as List;
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

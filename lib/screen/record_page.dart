@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:stretching/screen/diary/diary_archive_page.dart';
 import 'package:stretching/screen/diary/diary_entry_page1.dart';
+import 'package:stretching/screen/statistics/statistics_page.dart';
 import 'package:stretching/screen/stress/stress_score_log_page.dart';
 import 'package:stretching/screen/survey/survey_page.dart';
 import 'package:stretching/screen/survey/survey_page1.dart';
@@ -138,7 +138,7 @@ class RecordViewController extends GetxController {
     }
   }
 
-  Future<void> fetchStressScores() async {
+  Future<void> fetchStressScores({required bool toStatisticsPage}) async {
     isLoading.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
@@ -164,7 +164,11 @@ class RecordViewController extends GetxController {
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body) as List;
         stressScores.value = responseBody;
-        Get.to(() => const StressScoreLogPage(), arguments: stressScores);
+        if (toStatisticsPage) {
+          Get.to(() => StatisticsPage(stressScores: stressScores));
+        } else {
+          Get.to(() => StressScoreLogPage(stressScores: stressScores));
+        }
       } else {
         Get.snackbar(
           'Error',
@@ -295,6 +299,32 @@ class RecordPage extends StatelessWidget {
                               ),
                             ),
                           ),
+                          const SizedBox(
+                            width: 16,
+                          ),
+                          Expanded(
+                            child: SizedBox(
+                              height: 150,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF424242),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  controller.fetchStressScores(
+                                      toStatisticsPage: true); // 통계 버튼 클릭 시
+                                },
+                                child: const Text(
+                                  '통계',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(
@@ -313,8 +343,9 @@ class RecordPage extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  controller
-                                      .fetchStressScores(); // 스트레스 점수 로그 버튼 클릭 시
+                                  controller.fetchStressScores(
+                                      toStatisticsPage:
+                                          false); // 스트레스 점수 로그 버튼 클릭 시
                                 },
                                 child: const Text(
                                   '스트레스 점수 로그',
