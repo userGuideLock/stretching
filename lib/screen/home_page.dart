@@ -6,10 +6,9 @@ import 'package:get/get.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:stretching/health/health_page.dart';
 import 'package:stretching/screen/stress/stress_page1.dart';
-import 'package:stretching/screen/stress/stress_score_page.dart';
-import 'package:http/http.dart' as http;
 
 class HomeViewController extends GetxController {
   final Health _health = Health();
@@ -215,9 +214,16 @@ class HomeViewController extends GetxController {
           respiratoryRate += numericValue;
           respiratoryRateCount++;
         }
+        if (point.type == HealthDataType.SLEEP_ASLEEP ||
+            point.type == HealthDataType.SLEEP_AWAKE ||
+            point.type == HealthDataType.SLEEP_DEEP ||
+            point.type == HealthDataType.SLEEP_LIGHT ||
+            point.type == HealthDataType.SLEEP_REM) {
+          totalSleepMinutes += numericValue.toInt();
+          sleepFetchTime = point.dateTo;
+        }
         if (point.type == HealthDataType.SLEEP_ASLEEP) {
           asleepMinutes += numericValue.toInt();
-          sleepFetchTime = point.dateTo;
         }
         if (point.type == HealthDataType.SLEEP_AWAKE) {
           awakeMinutes += numericValue.toInt();

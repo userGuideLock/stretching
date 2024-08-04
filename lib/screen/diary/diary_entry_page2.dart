@@ -22,7 +22,6 @@ class DiaryEntryPage2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     // 이전 페이지에서 전달된 데이터 가져오기
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
