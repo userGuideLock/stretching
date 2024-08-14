@@ -171,7 +171,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 30),
                       const Text(
-                        'Email address*',
+                        '이름을 입력하세요!',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xffd9d9d9),
@@ -182,7 +182,7 @@ class LoginPage extends StatelessWidget {
                         onChanged: controller.updateEmail,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          labelText: 'Enter Email address*',
+                          labelText: 'ex) honggildong',
                           labelStyle: const TextStyle(color: Colors.grey),
                           hintText: 'john@gmail.com',
                           hintStyle: const TextStyle(color: Colors.grey),
@@ -196,7 +196,7 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        'Password*',
+                        '비밀번호를 입력하세요!',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xffd9d9d9),
@@ -208,7 +208,7 @@ class LoginPage extends StatelessWidget {
                         obscureText: true,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          labelText: 'Enter Password*',
+                          labelText: '디바이스 당 하나의 아이디만 접속됩니다.',
                           labelStyle: const TextStyle(color: Colors.grey),
                           hintText: 'Enter password',
                           hintStyle: const TextStyle(color: Colors.grey),

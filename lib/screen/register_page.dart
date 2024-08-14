@@ -172,7 +172,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 30),
                       const Text(
-                        'Your fullname*',
+                        '아이디를 입력하세요*',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xffd9d9d9),
@@ -183,7 +183,7 @@ class RegisterPage extends StatelessWidget {
                         onChanged: controller.updateName,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          labelText: 'Enter Fullname',
+                          labelText: '아이디를 입력하세요',
                           labelStyle: const TextStyle(color: Colors.grey),
                           hintText: 'nkm',
                           hintStyle: const TextStyle(color: Colors.grey),
