@@ -64,7 +64,7 @@ class DiaryEntryViewController3 extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        Get.offAll(() => const BottomNavigation());
+        Get.to(() => const BottomNavigation());
       } else if (response.statusCode == 400) {
         final responseBody = json.decode(response.body);
         if (responseBody['code'] == 1) {
@@ -122,7 +122,6 @@ class DiaryEntryPage3 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationController navController = Get.find();
     final Map<String, dynamic> previousData =
         Get.arguments as Map<String, dynamic>;
 
