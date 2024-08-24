@@ -71,7 +71,7 @@ class LoginViewController extends GetxController {
       isLoading = false;
       update(); // 로딩 종료
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         // 성공적으로 로그인이 완료되었을 때의 처리
         Get.snackbar(
           'Success',
@@ -80,8 +80,6 @@ class LoginViewController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        print("Response Body: ${response.body}");
-
         final userId = loginData['id'].toString();
 
         // SharedPreferences에 userId 저장
@@ -89,6 +87,7 @@ class LoginViewController extends GetxController {
         await prefs.setString('userId', userId);
 
         Get.offAll(() => const BottomNavigation()); // BottomNavigation으로 이동
+        print("Response Body: ${response.body}");
       } else {
         // 서버로부터 에러 응답을 받았을 때의 처리
         Get.snackbar(
